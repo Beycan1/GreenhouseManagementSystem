@@ -1,0 +1,55 @@
+
+Table "Users" {
+  "UserId" INT [pk, increment]
+  "Username" NVARCHAR(50) [unique, not null]
+  "Password" NVARCHAR(255) [not null]
+  "Role" NVARCHAR(20) [default: 'User']
+}
+
+Table "Devices" {
+  "DeviceId" INT [pk, increment]
+  "DeviceName" NVARCHAR(100) [not null]
+  "IsActive" BIT [default: 0]
+  "LastUpdated" DATETIME [default: `GETDATE()`]
+  "Sector" NVARCHAR(50)
+}
+
+Table "Sensors" {
+  "SensorId" INT [pk, increment]
+  "SensorName" NVARCHAR(100) [not null]
+  "Unit" NVARCHAR(20)
+}
+
+Table "SensorLog" {
+  "LogId" INT [pk, increment]
+  "SensorId" INT [not null]
+  "Value" DECIMAL(10,2) [not null]
+  "ReadingTime" DATETIME [default: `GETDATE()`]
+}
+
+Table "OperationsLog" {
+  "OpId" INT [pk, increment]
+  "OperationName" NVARCHAR(100)
+  "Details" NVARCHAR(MAX)
+  "Initiator" NVARCHAR(50)
+  "OpTime" DATETIME [default: `GETDATE()`]
+  "UserId" INT
+}
+
+Table "Schedules" {
+  "ScheduleId" INT [pk, increment]
+  "ActionName" NVARCHAR(100)
+  "Sector" NVARCHAR(50)
+  "ScheduledDate" DATETIME
+  "DurationMinutes" INT [default: 15]
+  "Status" NVARCHAR(50) [default: 'Pending']
+  "UserId" INT
+}
+
+Ref:"Sensors"."SensorId" < "SensorLog"."SensorId"
+
+Ref:"Users"."UserId" < "OperationsLog"."UserId"
+
+Ref:"Users"."UserId" < "Schedules"."UserId"
+
+Ref:"Devices"."Sector" < "Schedules"."Sector"
